@@ -12,6 +12,6 @@ JIRA_DATABASE_PASSWORD=your_jira_passwod_db
 JIRA_DATABASE_HOST=your_jira_host_db
 JIRA_DATABASE_PORT=your_jira_port_db
 </code></pre>
-2. run script
+2. run script  
+The upload will be saved to the script directory  
 <pre><code>python3 jira-export-invent.py</code></pre>
-  
