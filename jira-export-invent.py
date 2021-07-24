@@ -7,7 +7,7 @@ import psycopg2
 
 load_dotenv('.env')
 datetime_export = datetime.strftime(datetime.now(), '%Y-%m-%d')
-path_export = os.path.abspath(os.curdir)
+export_path = os.path.abspath(os.curdir)
 JIRA_DATABASE = os.getenv('JIRA_DATABASE')
 JIRA_DATABASE_USER = os.getenv('JIRA_DATABASE_USER')
 JIRA_DATABASE_PASSWORD = os.getenv('JIRA_DATABASE_PASSWORD')
@@ -24,11 +24,16 @@ connection = psycopg2.connect(
 
 
 with connection.cursor() as cursor:
-    '''All project equipment in a separate report'''
-    cursor.execute("""SELECT "NAME" FROM public."AO_8542F1_IFJ_OBJ" WHERE "OBJECT_TYPE_ID" = 166;""")
+    '''Get all projects'''
+    cursor.execute(
+        """SELECT "NAME"
+        FROM public."AO_8542F1_IFJ_OBJ"
+        WHERE "OBJECT_TYPE_ID" = 166;"""
+    )
     projects = [list(row) for row in cursor.fetchall()]
     for project in projects:
         project = project[0]
+        '''All project equipment in a separate report'''
         cursor.execute(
             f""" COPY (
             /*Column Office*/
@@ -54,7 +59,7 @@ with connection.cursor() as cursor:
 
             RIGHT JOIN
 
-            (SELECT 
+            (SELECT
                 "UsersTable"."OBJECT_ID",
                 "UsersTable"."User",
                 "InvDevSerPriTable"."Invent Number",
@@ -212,7 +217,7 @@ with connection.cursor() as cursor:
             ON "OfficeTable"."OBJECT_ID"="UseInvDevSerPriTable"."OBJECT_ID"
 
             ORDER BY "User" ASC
-            ) TO '{path_export}{datetime_export}_{project}.csv' WITH (FORMAT CSV, HEADER);"""
+            ) TO '{export_path}{datetime_export}_{project}.csv' WITH (FORMAT CSV, HEADER);"""
         )
 
     '''All equipment from all projects in one report'''
@@ -400,5 +405,5 @@ with connection.cursor() as cursor:
         ON "OfficeTable"."OBJECT_ID"="ProUseDevInvSerPriTable"."OBJECT_ID"
 
         ORDER BY "Project" ASC
-        ) TO '{path_export}{datetime_export}_All_devices.csv' WITH (FORMAT CSV, HEADER);"""
+        ) TO '{export_path}{datetime_export}_All_devices.csv' WITH (FORMAT CSV, HEADER);"""
     )
