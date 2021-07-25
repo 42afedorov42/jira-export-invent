@@ -24,7 +24,7 @@ connection = psycopg2.connect(
 
 
 with connection.cursor() as cursor:
-    '''Get all projects'''
+    """Get all projects"""
     cursor.execute(
         """SELECT "NAME"
         FROM public."AO_8542F1_IFJ_OBJ"
@@ -33,7 +33,7 @@ with connection.cursor() as cursor:
     projects = [list(row) for row in cursor.fetchall()]
     for project in projects:
         project = project[0]
-        '''All project equipment in a separate report'''
+        """All project equipment in a separate report"""
         cursor.execute(
             f""" COPY (
             /*Column Office*/
@@ -220,7 +220,7 @@ with connection.cursor() as cursor:
             ) TO '{export_path}{datetime_export}_{project}.csv' WITH (FORMAT CSV, HEADER);"""
         )
 
-    '''All equipment from all projects in one report'''
+    """All equipment from all projects in one report"""
     cursor.execute(
         f""" COPY (
         /*Office*/
